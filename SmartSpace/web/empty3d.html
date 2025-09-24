@@ -1,0 +1,33 @@
+<!-- 歷年空汙數據 -->
+<!-- https://airtw.epa.gov.tw/cht/Query/His_Data.aspx -->
+
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- <link href="style.css" rel="stylesheet" /> -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>F
+</head>
+
+<body id="main" style="height: 100vh;">
+    <script>
+        var chart = echarts.init(document.getElementById('main'));
+        chart.setOption({
+            grid3D: {},
+            xAxis3D: {},
+            yAxis3D: {},
+            zAxis3D: {},
+            series: [{
+                type: 'scatter3D',
+                symbolSize: 50,
+                data: [[-1, -1, -1], [0, 0, 0], [1, 1, 1]],
+                itemStyle: {
+                    opacity: 1
+                }
+            }]
+        })
+    </script>
+</body>
+
+</html>

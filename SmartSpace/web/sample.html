@@ -1,0 +1,40 @@
+<!-- 歷年空汙數據 -->
+<!-- https://airtw.epa.gov.tw/cht/Query/His_Data.aspx -->
+
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- <link href="style.css" rel="stylesheet" /> -->
+    <!-- 處理畫面過度放大的問題 -->
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+    <link type="text/css" rel="stylesheet" href="./css/style.css?v=1">
+    <script src="./dist/simplex-noise.js"></script>
+</head>
+
+<body id="main">
+    <div id='chart1'></div>
+    <div id='chart2'></div>
+    <div id='chart3'></div>
+    <div id='chart4'></div>
+
+    <!-- 左上雷達圖 -->
+    <script src="./radar.js"></script>
+    <!-- 右上折線圖 -->
+    <script src="./line.js"></script>
+    <!-- 左下3D長條圖 -->
+    <script src="./bar3d.js"></script>
+    <!-- 右下地圖+3D散點圖 -->
+    <script src="./map3d.js"></script>
+
+    <!-- 啟動Firebase雲端即時資料庫 -->
+    <script type="module" src="./listenFirebase.js"></script>
+</body>
+
+</html>
