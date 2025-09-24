@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- 處理畫面過度放大的問題 -->
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="./css/style.css">
+</head>
+
+<body id="main">
+    <div id='mainChart'></div>
+    <div id='rightUpChart'></div>
+    <div id='rightMiddleChart'></div>
+    <div id='rightDown'>
+        <div id='rightDown-left'></div>
+        <div id='rightDown-right'></div>
+    </div>
+
+    <script type="text/javascript">
+        
+        var barChart = echarts.init(document.getElementById('rightUpChart'));
+        var lineChart = echarts.init(document.getElementById('rightMiddleChart'));
+        var gaugeChart = echarts.init(document.getElementById('rightDown-left'));
+        var radarChart = echarts.init(document.getElementById('rightDown-right'));
+
+        function createMap(allData){
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYmlhYm9ibyIsImEiOiJjamVvejdlNXQxZnBuMndtdWhiZHRuaTNpIn0.PIS9wtUxm_rz_IzF2WFD1g';
+            var map = new mapboxgl.Map({
+                container: 'mainChart',
+                style: 'mapbox://styles/mapbox/light-v11',
+                center: [121.640522789, 25.076757629],
+                zoom: 11
+            }               
+            );
+
+            for (var i = 0; i < allData.length; i++){
+                const marker = new mapboxgl.Marker({color: '#A41623'})
+                    .setLngLat(allData[i]['coord'])
+                    .addTo(map);
+
+                marker.getElement().addEventListener(
+                    'click', function(e) {
+                        var markerCoord = marker.getLngLat();
+                        for (var j = 0; j < allData.length; j++){
+                            coord = allData[j]['coord'];
+                            if (markerCoord.lng == coord[0] && markerCoord.lat == coord[1]){
+                                setChart(allData[j]);
+                            }
+                        }
+                    }
+                );
+            }
+        }
+
+        function createChart(data, type, chart){
+            var values = data['value'];
+            var dateList = [];
+            var tempList = [];
+            var rhList = [];
+
+            for(var i = 0; i < values.length; i++){
+                var v = values[i];
+                dateList.push(v['date']);
+                tempList.push(v['temp']);
+                rhList.push('rh');
+            }
+
+            var option = {
+                title: {
+                    text: data['station'] + "月平均溫度",
+                    textStyle: {
+                        color: '#A41623'
+                    }
+                },
+                visualMap: {
+                    type: 'continuous',
+                    orient: 'horizontal',
+                    left: 'center',
+                    min: 10,
+                    max: 36,
+                    text: ['Hot', 'Cold'],
+                    dimension: 1,
+                    inRange:{
+                        color: ['#65B581', '#FFCE34', '#FD665F']
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: dateList
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 10,
+                    max: 40
+                },
+                series: [
+                    {
+                        data: tempList,
+                        type: type
+                    }
+                ]
+            }
+
+            chart.setOption(option);
+
+            chart.on('click', {targetType: 'axisLabel'}, params => {
+                var date = params.name;
+                for (var i = 0; i < values.length; i++) {
+                    var v = values[i];
+                    if (date == v['date']) {
+                        createGaugeChart(date, v['rh']);
+                        var radarValue = [v['temp'], v['rain'], v['rh'], v['daylight_hr']];
+                        createRadarChart(date, radarValue);
+                    }
+                }
+            });
+        }
+
+        function createRadarChart(date, value){
+            option = {
+                title: {
+                    text: date + '氣候數據\n雷達圖',
+                    textStyle: {
+                        color: '#A41623'
+                    }
+                },
+                lineStyle: {
+                    color: '#8BBEB2'
+                },
+                radar: {
+                    shape: 'circle',
+                    indicator: [        
+                        {name: '平均溫度', max: 50},
+                        {name: '雨量', max: 500},
+                        {name: '平均濕度', max: 100},
+                        {name: '日照', max: 250},
+                    ]
+                },
+                series: [
+                    {
+                        name: 'Weather',
+                        type: 'radar',
+                        data: [value]
+                    }
+                ]
+            };
+            radarChart.setOption(option);
+        }
+
+        function createGaugeChart(date, value){
+            option = {
+                title: {
+                    text: date + '平均相對濕度',
+                    textStyle: {
+                        color: '#A41623'
+                    }
+                },
+                series: [
+                    {
+                        type: 'gauge',
+                        axisLine: {
+                            lineStyle: {
+                                width: 30,
+                                color: [
+                                    [0.3, '#65B581'],
+                                    [0.7, '#FFCE34'],
+                                    [1, '#FD665F']
+                                ]
+                            }
+                        },
+                        pointer: {
+                            itemStyle: {
+                                color: 'auto'
+                            }
+                        },
+                        axisTick: {
+                            distance: -30,
+                            length: 8,
+                            lineStyle: {
+                                color: '#fff',
+                                width: 2
+                            }
+                        },
+                        splitline: {
+                            distance: -30,
+                            length: 30,
+                            lineStyle: {
+                                color: '#fff',
+                                width: 4
+                            }
+                        },
+                        axisLabel: {
+                            color: 'inherit',
+                            distance: 40,
+                            fontSize: 10
+                        },
+                        data: [
+                            {
+                                value: value
+                            }
+                        ]
+                    }
+                ]
+            };
+            gaugeChart.setOption(option);
+        }
+
+        function setChart(data) {
+            createChart(data, 'bar', barChart);
+            createChart(data, 'line', lineChart);
+            createRadarChart('',[]);
+            createGaugeChart('', 0);           
+        }
+
+        $.getJSON("weather.json", function(allData){
+            console.log(allData);
+            createMap(allData);
+            setChart(allData[0]);
+        });
+
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+#mainChart {
+    width: 60%;
+    height: 100%;
+    float:left;
+}
+
+#rightUpChart {
+    width: 40%;
+    height: 30%;
+    float:left;
+}
+
+#rightMiddleChart {
+    width: 40%;
+    height: 30%;
+    float:left;
+}
+
+#rightDown {
+    width: 40%;
+    height: 40%;
+    float:left;
+}
+
+#rightDown-left {
+    width: 50%;
+    height: 100%;
+    float:left;
+}
+
+#rightDown-right {
+    width: 50%;
+    height: 100%;
+    float:left;
+}
